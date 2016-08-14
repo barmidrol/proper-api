@@ -17,12 +17,12 @@ module Proper
         end
 
         #  Defines the schema for the request parameters. It effectively
-        #  defines Request class, includes Api::Unified::Entity module into it,
+        #  defines Request class, includes ::Proper::Api::Entity module into it,
         #  invokes ::schema method and evaluates the block in the context of the
         #  schema builder.
         #
         def request_schema(&block)
-          request_class = const_defined?(:Request) ? const_get(:Request) : const_set(:Request, Class.new { include ::Api::Unified::Entity })
+          request_class = const_defined?(:Request) ? const_get(:Request) : const_set(:Request, Class.new { include ::Proper::Api::Entity })
           request_class.schema do |s|
             s.instance_eval(&block)
           end
@@ -35,14 +35,14 @@ module Proper
         end
 
         #  Defines the schema for the response parameters. It effectively
-        #  defines Response class, includes Api::Unified::Entity module into it,
+        #  defines Response class, includes ::Proper::Api::Entity module into it,
         #  invokes ::schema method and evaluates the block in the context of the
         #  schema builder.
         #
         def response_schema(constant = nil, &block)
           return const_set(:Response, constant) if constant
 
-          response_class = const_defined?(:Response) ? const_get(:Response) : const_set(:Response, Class.new { include ::Api::Unified::Entity })
+          response_class = const_defined?(:Response) ? const_get(:Response) : const_set(:Response, Class.new { include ::Proper::Api::Entity })
           response_class.schema do |s|
             s.instance_eval(&block)
           end

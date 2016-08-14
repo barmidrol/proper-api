@@ -1,3 +1,5 @@
+require_relative 'base'
+
 module Proper
   module Api
     module Dsl
@@ -5,7 +7,7 @@ module Proper
 
         #  This class implements code generation routes for C# language.
         #
-        class Csharp < Base
+        class Csharp < ::Proper::Api::Dsl::Codegen::Base
 
         protected
 

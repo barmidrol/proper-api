@@ -1,5 +1,8 @@
 require "colorize"
 
+require_relative 'dsl/codegen/csharp'
+require_relative 'dsl/codegen/doc'
+
 module Proper
   module Api
 
@@ -86,7 +89,7 @@ module Proper
         #  Sample usage is pretty straightforward:
         #
         #  class MyController < ApplicationController
-        #    include Api::Unified::Dsl
+        #    include ::Proper::Api::Dsl
         #
         #    provides :create do
         #      description { "Much useful description such wow" }
@@ -108,7 +111,7 @@ module Proper
         def provides(action, &block)
           mod = Module.new
 
-          mod.module_eval   { include Api::Unified::Definition }
+          mod.module_eval   { include ::Proper::Api::Definition }
           mod.module_eval   &block
 
           @apis ||= {}

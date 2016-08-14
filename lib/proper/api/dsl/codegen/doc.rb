@@ -1,3 +1,5 @@
+require_relative 'base'
+
 module Proper
   module Api
     module Dsl
@@ -5,7 +7,7 @@ module Proper
 
         #  This class implements documentation generation.
         #
-        class Doc < Base
+        class Doc < ::Proper::Api::Dsl::Codegen::Base
 
           #  Contains a hash of controllers pointing to a set of endpoints
           attr_accessor :controllers
