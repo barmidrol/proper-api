@@ -1,0 +1,18 @@
+<div class="endpoint">
+  <h2><%= endpoint.method.to_s.upcase %> <%= endpoint.path.to_s.gsub("(.:format)", "") %></h2>
+  <p><%= description_for(endpoint) %></p>
+
+  <% if endpoint.member? %>
+  <p><pre><code>The :id placeholder in the URL has to be replaced with the identifier of the entity to be manipulated.</code></pre></p>
+  <% end %>
+
+  <div class="request">
+    <% schema = operation_class( endpoint.options[:via], endpoint.action ).const_get(:Request).schema_definition rescue nil %>
+    <%= render "schema", schema: schema.try(:properties).present? ? schema : nil %>
+  </div>
+
+  <div class="response">
+    <% schema = operation_class( endpoint.options[:via], endpoint.action ).const_get(:Response).schema_definition rescue nil %>
+    <%= render "schema", schema: schema.try(:properties).present? ? schema : nil %>
+  </div>
+</div>

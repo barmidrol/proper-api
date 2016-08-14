@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Fisikal Unified API documentation</title>
+
+  <style type="text/css">
+    body {
+      background: gray;
+      padding: 5em;
+      font-family: "Courier New"
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    section {
+      margin: 2em 0;
+      padding: 2em;
+      background: white;
+    }
+
+    .endpoint {
+      border-top: 2px solid gray;
+      padding-top: 1em;
+      margin-bottom: 1em;
+    }
+
+    comment {
+      font-weight: normal;
+      color: gray;
+      display: block;
+      margin-top: 0.5em;
+    }
+
+    span {
+      font-weight: bold;
+    }
+
+    .indent {
+      display: block;
+      margin-left: 1em;
+    }
+
+    .indent-2x {
+      display: block;
+      margin-left: 2em;
+    }
+
+    pre {
+      white-space: pre-line;
+      font-size: 14px;
+      font-family: "Courier New";
+    }
+
+    .request {
+      margin-bottom: 1px;
+    }
+
+    .request::before {
+      content: "Request schema";
+    }
+
+    .response {
+      margin-bottom: 1px;
+    }
+
+    .response::before {
+      content: "Response schema";
+    }
+
+    .request::before, .response::before {
+      display: block;
+      border-bottom: 1px solid gray;
+      padding: 0.5em 0;
+      margin: 0.5em 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="controllers">
+    <% controllers.each do |controller, endpoints| %>
+      <section>
+        <h1><%= controller %></h1>
+        <%= markdown_to_html( controller.const_get(:DESCRIPTION) ) %>
+
+        <% endpoints.each do |endpoint| %>
+          <% puts "*" * 100 %>
+          <% puts endpoint.inspect %>
+
+          <%= render( "endpoint", endpoint: endpoint, controller: controller ) %>
+        <% end %>
+      </section>
+    <% end %>
+  </div>
+
+  <div class="entities">
+    <% entities.each do |entity| %>
+      <section>
+        <% puts "*" * 100 %>
+        <% puts entity.inspect %>
+
+        <a name="<%= humanize_entity_class( entity.name ) %>"></a>
+        <h2><%= humanize_entity_class( entity.name ) %></h2>
+        <%= markdown_to_html( entity.description ) %>
+        <%= render( "schema", schema: entity.schema_definition  ) %>
+      </section>
+    <% end %>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+<% if schema %>
+  <span>{</span><br />
+  <% schema.properties.each.with_index do |(name, property), index| %>
+    <% example, comment = humanize_property_type(property) %>
+
+    <comment class="indent-2x"><%= comment %></comment>
+    <% if property.is_a?(Respect::HasOneSchema) %>
+      <span class="indent-2x"><%= name.to_s.inspect %>: <a href="#<%= humanize_entity_class( property.options[:of] ) %>"><%= humanize_entity_class( property.options[:of] ) %></a><%= "," if index < (schema.properties.size - 1) %></span>
+    <% elsif property.is_a?(Respect::HasManySchema) %>
+      <span class="indent-2x"><%= name.to_s.inspect %>: [ <a href="#<%= humanize_entity_class( property.options[:of] ) %>"><%= humanize_entity_class( property.options[:of] ) %></a> ]<%= "," if index < (schema.properties.size - 1) %></span>
+    <% elsif property.is_a?(Respect::HashSchema) %>
+      <span class="indent-2x same-line"><%= name.to_s.inspect %>: <%= render( "schema", schema: property ) %><%= "," if index < (schema.properties.size - 1) %></span><br />
+    <% else %>
+      <span class="indent-2x"><%= name.to_s.inspect %>: <%= example %><%= "," if index < (schema.properties.size - 1) %></span>
+    <% end %>
+  <% end %>
+  <span>}</span><% end %>
