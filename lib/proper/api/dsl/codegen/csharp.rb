@@ -377,12 +377,6 @@ module Proper
             end
           end
 
-          #  Returns current indent.
-          #
-          def indent
-            "    " * @indent
-          end
-
         end
 
       end

@@ -2,6 +2,7 @@ require "colorize"
 
 require_relative 'dsl/codegen/csharp'
 require_relative 'dsl/codegen/doc'
+require_relative 'dsl/codegen/ruby'
 
 module Proper
   module Api

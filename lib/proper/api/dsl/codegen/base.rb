@@ -107,6 +107,20 @@ module Proper
             File.open( File.join( options[:folder], folder, file ), "wb", &block )
           end
 
+          #  Returns current indent.
+          #
+          def indent
+            "    " * @indent
+          end
+
+          #  Outputs smth increasing the indent for the time of the block.
+          #
+          def indented(&block)
+            @indent += 1
+            yield
+            @indent += 1
+          end
+
         end
 
       end
