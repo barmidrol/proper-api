@@ -23,7 +23,7 @@ module Proper
         #
         def request_schema(&block)
           request_class = const_defined?(:Request) ? const_get(:Request) : const_set(:Request, Class.new { include ::Proper::Api::Entity })
-          request_class.schema do |s|
+          request_class.schema(fields: true) do |s|
             s.instance_eval(&block)
           end
         end
@@ -43,7 +43,7 @@ module Proper
           return const_set(:Response, constant) if constant
 
           response_class = const_defined?(:Response) ? const_get(:Response) : const_set(:Response, Class.new { include ::Proper::Api::Entity })
-          response_class.schema do |s|
+          response_class.schema(fields: true) do |s|
             s.instance_eval(&block)
           end
         end
