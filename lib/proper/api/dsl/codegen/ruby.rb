@@ -104,7 +104,7 @@ module Proper
             model.schema_definition.properties.each do |name, schema|
               field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
               field_definition += " :#{name}, "
-              field_definition += schema.options.to_json
+              field_definition += schema.options.inspect
 
               file << "#{ indent }#{ field_definition }\n"
             end
