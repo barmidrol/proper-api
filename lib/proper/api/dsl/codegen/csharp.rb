@@ -292,6 +292,7 @@ module Proper
             namespaces << "System.Collections.Generic"
             namespaces << "System.Threading.Tasks"
             namespaces << "Newtonsoft.Json"
+            namespaces << "System"
 
             namespaces.each do |ns|
               file << "#{indent}using #{ ns };\n"
