@@ -38,7 +38,7 @@ module Proper
           #  Converts API's namespace to C# one.
           #
           def sanitize_api_namespace( controller )
-            [ api_namespace, controller.name.split("::")[1...-1] ].flatten.compact.join("::")
+            [ api_namespace, controller.name.split("::")[0...-1] ].flatten.compact.join("::")
           end
 
           #  Converts API's class to C# one.
@@ -74,15 +74,9 @@ module Proper
           #  Emits class statements for the model.
           #
           def emit_model_class!( file, model, &block )
-            inheritance = if request_models.include?(model)
-              " < Proper::Api::Interop::Ruby::RequestMessage"
-            elsif response_models.include?(model)
-              " < Proper::Api::Interop::Ruby::ResponseMessage"
-            else
-              ""
-            end
-              
-            file << "#{indent}class #{ model }#{ inheritance }\n"
+            emit_summary_comment!(file, model.description) unless (request_models.include?(model) || response_models.include?(model))
+
+            file << "#{indent}class #{sanitize_model_namespace(model)}::#{ sanitize_model_class(model) }\n"
             
             @indent += 1
 
@@ -102,10 +96,14 @@ module Proper
             @indent += 1
 
             model.schema_definition.properties.each do |name, schema|
+              options = schema.options.dup
+              doc = options.delete(:doc)
+
               field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
               field_definition += " :#{name}, "
-              field_definition += schema.options.inspect
+              field_definition += schema.options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
 
+              file << "#{ indent }# #{doc}\n"
               file << "#{ indent }#{ field_definition }\n"
             end
 
@@ -114,16 +112,116 @@ module Proper
             file << "\n"            
           end
 
+          #  Emits API's class definition.
+          #
+          def emit_api_class!( file, controller )
+            emit_summary_comment!(file, controller.const_get(:DESCRIPTION))
+
+            file << "#{indent}class #{sanitize_api_namespace(controller)}::#{sanitize_api_class(controller)} < Proper::Api::Interop::Ruby::Controller\n\n"
+            
+            @indent += 1
+            yield
+            @indent -= 1
+
+            file << "#{indent}end\n"
+          end
+
+          #  Emmits description comment into file provided.
+          #
+          def emit_summary_comment!(file, comment)
+            comment.split("\n").each do |line|
+              file << "#{indent}#  #{line.gsub(/^\s+/, "")}\n"
+            end
+
+            file << "#{indent}#\n"
+          end
+
+          #  Gets request class from the endpoint.
+          #
+          def extract_request_class( endpoint )
+            endpoint.options[:via].const_get(:Request)
+          end
+
+          #  Gets request class from the endpoint.
+          #
+          def extract_response_class( endpoint )
+            endpoint.options[:via].const_get(:Response)
+          end
+
+          #  Emits controller's methods.
+          #
+          def emit_api_methods!( file, controller, endpoints )
+            endpoints.each do |endpoint|
+              puts "  Dumping action #{endpoint.action} (#{ endpoint.path })".green
+
+              request_class   = extract_request_class(endpoint)
+              response_class  = extract_response_class(endpoint)
+
+              request_class = request_class.nil? ? "" : ruby_model_fqn(request_class)
+              response_class = response_class.nil? ? "" : ruby_model_fqn(response_class)
+
+              signature = []
+              signature << "request = nil" if request_class.present?
+
+              description = endpoint.options[:via].const_get(:DESCRIPTION)
+              
+              emit_summary_comment!( file, description )
+
+              request_class_model = extract_request_class(endpoint)
+              response_class_model = extract_response_class(endpoint)
+
+              if request_class_model
+                file << "#{ indent }#  The request class fields are:\n"
+
+                request_class_model.schema_definition.properties.each do |name, schema|
+                  options = schema.options.dup
+                  doc = options.delete(:doc)
+
+                  field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
+                  field_definition += " :#{name}, "
+                  field_definition += schema.options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
+
+                  file << "#{ indent }#    #{ field_definition }\n"
+                end
+
+                file << "#{ indent }#\n"
+              end
+
+              if response_class_model
+                file << "#{ indent }#  The response class fields are:\n"
+
+                response_class_model.schema_definition.properties.each do |name, schema|
+                  options = schema.options.dup
+                  doc = options.delete(:doc)
+
+                  field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
+                  field_definition += " :#{name}, "
+                  field_definition += schema.options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
+
+                  file << "#{ indent }#    #{ field_definition }\n"
+                end
+
+                file << "#{ indent }#\n"
+              end
+
+              file << "#{indent}def #{ sanitize_method_name( endpoint.action ) }(#{ signature.join(", ") })\n"
+              file << "#{indent}  request = #{request_class}.parse( request ) if request.is_a?(Hash)\n"
+              file << "#{indent}  #{endpoint.method()}( #{ endpoint.path.inspect.gsub(":id", '" + request.id.to_s + "').gsub("(.:format)", ".json") }, request )\n"
+              file << "#{indent}end\n\n"
+            end
+          end
+
           #  Dumps model file.
           #
           def dump_model( model )
             puts "Dumping model #{model.name}".green
 
-            path = ruby_model_fqn(model).gsub( models_namespace, "" ).split("::").compact.map { |part| part.underscore }.join("/")
-            path = "models" + path + ".rb"
+            path = ruby_model_fqn(model)[ models_namespace.size .. -1 ].split("::").select(&:present?).compact.map { |part| part.underscore }.join("/")
+            path = "models/" + path + ".rb"
 
             write_file( path ) do |file|
               @indent = 0
+
               emit_model_class!( file, model ) do
                 emit_model_fields!( file, model )
               end
@@ -134,14 +232,17 @@ module Proper
           #
           def dump_endpoints( controller, endpoints )
             puts "Dumping controller #{controller.name}".green
-          end
 
-          #  mkdir -p for the specified path + open for write combined in one routine.
-          #  Yields a file object which can be used for writing.
-          #
-          def write_file(relative_path, &block)
-            puts relative_path
-            yield STDOUT
+            path = ruby_api_fqn(controller)[ api_namespace.size .. -1 ].split("::").select(&:present?).map { |part| part.underscore }.join("/")
+            path = "controllers/" + path + ".rb"
+
+            write_file( path ) do |file|
+              @indent = 0
+
+              emit_api_class!( file, controller ) do
+                emit_api_methods!( file, controller, endpoints )
+              end
+            end
           end
 
           #  Returns current indent.

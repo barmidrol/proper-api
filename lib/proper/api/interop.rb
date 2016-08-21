@@ -1,5 +1,6 @@
 module Proper
   module Api
-    VERSION = "0.2.0"
+    module Interop
+    end
   end
 end
