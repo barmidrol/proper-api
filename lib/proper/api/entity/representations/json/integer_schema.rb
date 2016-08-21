@@ -7,7 +7,7 @@ class Respect::IntegerSchema::JSON
       if schema.options[:allow_nil] 
         return nil 
       else
-        raise Respect::ValidationError
+        raise Respect::ValidationError, "object is nil but this #{self.class} does not allow nil"
       end
     end
 
@@ -19,7 +19,7 @@ class Respect::IntegerSchema::JSON
       if schema.options[:allow_nil] 
         return nil 
       else
-        raise Respect::ValidationError
+        raise Respect::ValidationError, "object is nil but this #{self.class} does not allow nil"
       end
     end
 

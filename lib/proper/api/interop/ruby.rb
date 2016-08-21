@@ -6,3 +6,5 @@ module Proper
     end
   end
 end
+
+require "proper/api/interop/ruby/controller"

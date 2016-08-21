@@ -1,3 +1,5 @@
+require 'rest-client'
+
 module Proper
   module Api
     module Interop
@@ -18,10 +20,8 @@ module Proper
 
           %w(get post put delete).each do |method|
             define_method( method ) do |uri, entity|
-              begin
-                RestClient.send( method, options[:url] + uri, entity.represent( options[:format] || :json ) )
-              rescue RestClient::Exception => e
-              end
+              response = ::RestClient.send( method, options[:url] + uri, entity.represent( options[:format] || :json ) )
+              response.body
             end
           end
 

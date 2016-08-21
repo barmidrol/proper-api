@@ -9,6 +9,8 @@ class Respect::HashSchema::JSON
     raise Respect::ValidationError, "object is nil but this #{self.class} does not allow nil" if object.nil? && !schema.allow_nil?
     return nil if object.nil?
 
+    object = object.with_indifferent_access if value_is_hash
+
     schema.properties.inject({}) do |memo, (name, property_schema)|
       value = if getter = property_schema.options[:get]
         getter.call( object )
@@ -29,6 +31,8 @@ class Respect::HashSchema::JSON
   def parse(object, schema, options = {})
     raise Respect::ValidationError, "object is nil but this #{self.class} does not allow nil" if object.nil? && !schema.allow_nil?
     return nil if object.nil?
+
+    object = object.with_indifferent_access
 
     schema.properties.inject({}) do |memo, (name, property_schema)|
       property_value = object[ name ]

@@ -205,8 +205,10 @@ module Proper
               end
 
               file << "#{indent}def #{ sanitize_method_name( endpoint.action ) }(#{ signature.join(", ") })\n"
-              file << "#{indent}  request = #{request_class}.parse( request ) if request.is_a?(Hash)\n"
-              file << "#{indent}  #{endpoint.method()}( #{ endpoint.path.inspect.gsub(":id", '" + request.id.to_s + "').gsub("(.:format)", ".json") }, request )\n"
+              file << "#{indent}  request = #{request_class}.parse( :json, request ) if request.is_a?(Hash)\n"
+              file << "#{indent}  request = #{request_class}.new if request.nil?\n"
+              file << "#{indent}  data = #{endpoint.method()}( #{ endpoint.path.inspect.gsub(":id", '" + request.id.to_s + "').gsub("(.:format)", ".json") }, request )\n"
+              file << "#{indent}  #{response_class}.parse( :json, MultiJson.load(data) )\n"
               file << "#{indent}end\n\n"
             end
           end
@@ -218,6 +220,8 @@ module Proper
 
             path = ruby_model_fqn(model)[ models_namespace.size .. -1 ].split("::").select(&:present?).compact.map { |part| part.underscore }.join("/")
             path = "models/" + path + ".rb"
+
+            ensure_all_modules_are_present!( ruby_model_fqn(model) )
 
             write_file( path ) do |file|
               @indent = 0
@@ -236,12 +240,48 @@ module Proper
             path = ruby_api_fqn(controller)[ api_namespace.size .. -1 ].split("::").select(&:present?).map { |part| part.underscore }.join("/")
             path = "controllers/" + path + ".rb"
 
+            ensure_all_modules_are_present!( ruby_api_fqn(controller) )
+
             write_file( path ) do |file|
               @indent = 0
 
               emit_api_class!( file, controller ) do
                 emit_api_methods!( file, controller, endpoints )
               end
+            end
+          end
+
+          #  In order to make Rails' autoloading happy, we need to define empty modules
+          #  so that all intermediate constants are present.
+          #
+          def ensure_all_modules_are_present!( class_name )
+            puts "Ensuring intermediate modules for #{class_name}".green
+
+            @existing_class_map ||= begin 
+              result =  self.models.map { |model| ruby_model_fqn(model) }
+              result += self.endpoints.map { |endpoint| ruby_api_fqn(endpoint.controller) }
+              result =  result.uniq.index_by(&:to_s)
+            end
+
+            class_name.split("::")[0...-1].inject("") do |module_name, part|
+              name = [ module_name, part ].select(&:present?).join("::")
+              path = "../" + name.underscore + ".rb"
+
+              write_file( path ) do |file|
+                parts = name.split("::")
+
+                parts.inject("") do |indent, part|
+                  file << "#{indent}module #{part.camelize}\n"
+                  indent + "  "
+                end
+
+                parts.inject("  " * (parts.size - 1)) do |indent, part|
+                  file << "#{indent}end\n"
+                  indent[0...-2]
+                end
+              end
+
+              name
             end
           end
 
