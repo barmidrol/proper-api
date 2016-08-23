@@ -46,7 +46,7 @@ module Proper
 
             endpoint = Endpoint.new( 
               route.path.spec.to_s, 
-              method_map[ route.constraints[:request_method] ],
+              method_map[ route.try(:verb) || route.constraints[:request_method] ],
               controller,
               route.defaults[:action],
               controller.apis[ route.defaults[:action].to_sym ]
