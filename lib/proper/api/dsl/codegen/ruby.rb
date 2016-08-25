@@ -103,7 +103,7 @@ module Proper
 
               field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
               field_definition += " :#{name}, "
-              field_definition += schema.options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
+              field_definition += options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
 
               file << "#{ indent }# #{doc}\n"
               file << "#{ indent }#{ field_definition }\n"
@@ -183,7 +183,7 @@ module Proper
 
                   field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
                   field_definition += " :#{name}, "
-                  field_definition += schema.options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
+                  field_definition += options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
 
                   file << "#{ indent }#    #{ field_definition }\n"
                 end
@@ -202,7 +202,7 @@ module Proper
 
                   field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
                   field_definition += " :#{name}, "
-                  field_definition += schema.options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
+                  field_definition += options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
 
                   file << "#{ indent }#    #{ field_definition }\n"
                 end
