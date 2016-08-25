@@ -6,6 +6,7 @@ require_relative "entity/schemas/instant_schema"
 require_relative "entity/schemas/attachment_schema"
 require_relative "entity/schemas/date_schema"
 require_relative "entity/schemas/geo_point_schema"
+require_relative "entity/schemas/enum_schema"
 
 require_relative "entity/representations/schema"
 require_relative "entity/representations/json"
