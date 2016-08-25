@@ -97,6 +97,8 @@ module Proper
 
             model.schema_definition.properties.each do |name, schema|
               options = schema.options.dup
+              options[:of] = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+              
               doc = options.delete(:doc)
 
               field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
@@ -175,6 +177,8 @@ module Proper
 
                 request_class_model.schema_definition.properties.each do |name, schema|
                   options = schema.options.dup
+                  options[:of] = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+
                   doc = options.delete(:doc)
 
                   field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
@@ -192,6 +196,8 @@ module Proper
 
                 response_class_model.schema_definition.properties.each do |name, schema|
                   options = schema.options.dup
+                  options[:of] = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+
                   doc = options.delete(:doc)
 
                   field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
