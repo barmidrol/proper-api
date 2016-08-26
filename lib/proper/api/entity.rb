@@ -42,6 +42,7 @@ module Proper
         #  Represents the given data using the strategy supplied as +via+ param.
         #
         def parse(via, data, options = {}, object = nil)
+          data = data.to_unsafe_hash if data.respond_to?(:to_unsafe_hash) 
           hash = @schema_definition.parse( via, data, options )
 
           return hash if object == {}
