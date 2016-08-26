@@ -121,9 +121,9 @@ module Proper
             model.schema_definition.properties.each do |name, schema|
               emit_enum!( schema.values_module ) if schema.is_a?(Respect::EnumSchema)
 
-              options         = schema.options.dup
-              options[:of]    = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
-              options[:from]  = ruby_model_fqn( options[:from].constantize ) if options.has_key?(:from)
+              options           = schema.options.dup
+              options[:of]      = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+              options[:values]  = ruby_model_fqn( options[:values].constantize ) if options.has_key?(:values)
               
               doc = options.delete(:doc)
 
@@ -202,9 +202,9 @@ module Proper
                 file << "#{ indent }#  The request class fields are:\n"
 
                 request_class_model.schema_definition.properties.each do |name, schema|
-                  options         = schema.options.dup
-                  options[:of]    = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
-                  options[:from]  = ruby_model_fqn( options[:from].constantize ) if options.has_key?(:from)
+                  options           = schema.options.dup
+                  options[:of]      = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+                  options[:values]  = ruby_model_fqn( options[:values].constantize ) if options.has_key?(:values)
 
                   doc = options.delete(:doc)
 
@@ -222,9 +222,9 @@ module Proper
                 file << "#{ indent }#  The response class fields are:\n"
 
                 response_class_model.schema_definition.properties.each do |name, schema|
-                  options         = schema.options.dup
-                  options[:of]    = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
-                  options[:from]  = ruby_model_fqn( options[:from].constantize ) if options.has_key?(:from)
+                  options           = schema.options.dup
+                  options[:of]      = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+                  options[:values]  = ruby_model_fqn( options[:values].constantize ) if options.has_key?(:values)
 
                   doc = options.delete(:doc)
 
