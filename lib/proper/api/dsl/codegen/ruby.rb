@@ -92,7 +92,7 @@ module Proper
           #  Ensures an enum module with costants is present.
           #
           def emit_enum!( enum )
-            module_name = ruby_model_fqn( enum.constantize )
+            module_name = ruby_model_fqn( enum )
 
             puts "Dumping enum #{enum}".green
 
@@ -104,9 +104,8 @@ module Proper
             write_file( path ) do |file|
               file << "module #{module_name}\n"
 
-              from = enum.constantize
-              from.constants.each do |const_name| 
-                file << "  #{const_name} = #{from.const_get(const_name).inspect}\n"
+              enum.constants.each do |const_name| 
+                file << "  #{const_name} = #{enum.const_get(const_name).inspect}\n"
               end
 
               file << "end\n"
@@ -120,7 +119,7 @@ module Proper
             @indent += 1
 
             model.schema_definition.properties.each do |name, schema|
-              emit_enum!( schema.options[:from] ) if schema.is_a?(Respect::EnumSchema)
+              emit_enum!( schema.values_module ) if schema.is_a?(Respect::EnumSchema)
 
               options         = schema.options.dup
               options[:of]    = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)

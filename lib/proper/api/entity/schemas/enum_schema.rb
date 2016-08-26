@@ -7,22 +7,22 @@ module Respect
   #  Usage example:
   #
   #  Respect::HashSchema.define do |s|
-  #    s.enum :type, from: My::Module::With::Constants
+  #    s.enum :type, values: My::Module::With::Constants
   #  end
   #  
   class EnumSchema < StringSchema
 
     #  Returns the module instance is enum is driven by.
     #
-    def from
-      @from ||= options[:from].constantize
+    def values_module
+      @values_module ||= options[:values].constantize
     end
 
     #  Returns values available through this schema.
     #
     def values
-      @values ||= from.constants.inject({}) do |memo, const_name| 
-        memo.merge(const_name => from.const_get(const_name))
+      @values ||= values_module.constants.inject({}) do |memo, const_name| 
+        memo.merge(const_name => values_module.const_get(const_name))
       end
     end
 

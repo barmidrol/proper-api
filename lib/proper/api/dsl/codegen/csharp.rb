@@ -189,11 +189,11 @@ module Proper
             end
 
             if schema.is_a?(Respect::EnumSchema)
-              type = sanitize_model_namespace( schema.from ) + "." + sanitize_model_class( schema.from )
+              type = sanitize_model_namespace( schema.values_module ) + "." + sanitize_model_class( schema.values_module )
               custom = type
               collection = false
 
-              emit_enum!( schema.from )
+              emit_enum!( schema.values_module )
             end
 
             if schema.is_a?(Respect::HasManySchema)
