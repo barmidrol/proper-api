@@ -188,6 +188,14 @@ module Proper
               collection = false
             end
 
+            if schema.is_a?(Respect::EnumSchema)
+              type = sanitize_model_namespace( schema.from ) + "." + sanitize_model_class( schema.from )
+              custom = type
+              collection = false
+
+              emit_enum!( schema.from )
+            end
+
             if schema.is_a?(Respect::HasManySchema)
               type = "List<" + sanitize_model_namespace( schema.of ) + "." + sanitize_model_class( schema.of ) + ">"
               custom = type
@@ -197,24 +205,37 @@ module Proper
             return type, custom, collection
           end
 
-          #  Emits the enum for the schema passed.
+          #  Ensures an enum module with costants is present.
           #
-          def emit_enum!( file, name, schema )
-            type = name.to_s.camelize.singularize + "Enum"
+          def emit_enum!( enum )
+            module_name = sanitize_model_namespace( enum ) + "." + sanitize_model_class( enum )
 
-            file << "#{indent}[DataContract]\n"
-            file << "#{indent}public enum #{type} {\n"
-            @indent += 1
+            puts "Dumping enum #{enum}".green
 
-            schema.options[:in].each do |value|
-              file << "#{indent}[EnumMember(Value = #{value.to_s.inspect})]\n"
-              file << "#{indent}#{ sanitize_enum_value(value, schema.options[:const_module]) },\n"
+            path = module_name.gsub( models_namespace, "" ).gsub(/^\.?/, "").gsub(".", "/")
+            path = "Models/" + path + ".designer.cs"
+
+            write_file( path ) do |file|
+              file << "using System.Collections.Generic;\n"
+              file << "using System.Runtime.Serialization;\n"
+
+              file << "\n"
+              file << "namespace #{ sanitize_model_namespace( enum ) } {\n"
+
+              file << "    [DataContract]\n"
+              file << "    public enum #{ sanitize_model_class( enum ) } {\n"
+
+              enum.constants.each do |const_name| 
+                value = enum.const_get( const_name )
+
+                file << "        [EnumMember(Value = #{value.to_s.inspect})]\n"
+                file << "        #{ sanitize_enum_value(value, enum) },\n"
+              end
+
+              file << "    }\n"
+
+              file << "}\n"
             end
-
-            @indent -= 1
-            file << "#{indent}}\n\n"
-
-            return type
           end
 
           #  Emits fields for the model.
@@ -235,16 +256,6 @@ module Proper
                 end
 
                 file << "\n\n"
-              end
-
-              if schema.options.has_key?(:in)
-                type = emit_enum!( file, name, schema )
-                type = type + "?" if schema.options[:allow_nil]
-              end
-
-              if schema.is_a?(::Respect::ArraySchema) && schema.item.options[:in]
-                list_item_type = emit_enum!( file, name, schema.item )
-                type = "List<#{ list_item_type }>"
               end
 
               emit_summary_comment!(file, schema.options[:doc]) if schema.options[ :doc ]

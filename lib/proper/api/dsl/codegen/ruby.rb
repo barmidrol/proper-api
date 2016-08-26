@@ -89,6 +89,30 @@ module Proper
             file << "#{indent}end\n"
           end
 
+          #  Ensures an enum module with costants is present.
+          #
+          def emit_enum!( enum )
+            module_name = ruby_model_fqn( enum.constantize )
+
+            puts "Dumping enum #{enum}".green
+
+            path = module_name[ models_namespace.size .. -1 ].split("::").select(&:present?).compact.map { |part| part.underscore }.join("/")
+            path = "models/" + path + ".rb"
+
+            ensure_all_modules_are_present!( module_name )
+
+            write_file( path ) do |file|
+              file << "module #{module_name}\n"
+
+              from = enum.constantize
+              from.constants.each do |const_name| 
+                file << "  #{const_name} = #{from.const_get(const_name).inspect}\n"
+              end
+
+              file << "end\n"
+            end
+          end
+
           #  Emits fields for the model.
           #
           def emit_model_fields!( file, model )
@@ -96,8 +120,11 @@ module Proper
             @indent += 1
 
             model.schema_definition.properties.each do |name, schema|
-              options = schema.options.dup
-              options[:of] = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+              emit_enum!( schema.options[:from] ) if schema.is_a?(Respect::EnumSchema)
+
+              options         = schema.options.dup
+              options[:of]    = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+              options[:from]  = ruby_model_fqn( options[:from].constantize ) if options.has_key?(:from)
               
               doc = options.delete(:doc)
 
@@ -176,8 +203,9 @@ module Proper
                 file << "#{ indent }#  The request class fields are:\n"
 
                 request_class_model.schema_definition.properties.each do |name, schema|
-                  options = schema.options.dup
-                  options[:of] = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+                  options         = schema.options.dup
+                  options[:of]    = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+                  options[:from]  = ruby_model_fqn( options[:from].constantize ) if options.has_key?(:from)
 
                   doc = options.delete(:doc)
 
@@ -195,8 +223,9 @@ module Proper
                 file << "#{ indent }#  The response class fields are:\n"
 
                 response_class_model.schema_definition.properties.each do |name, schema|
-                  options = schema.options.dup
-                  options[:of] = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+                  options         = schema.options.dup
+                  options[:of]    = ruby_model_fqn( options[:of].constantize ) if options.has_key?(:of)
+                  options[:from]  = ruby_model_fqn( options[:from].constantize ) if options.has_key?(:from)
 
                   doc = options.delete(:doc)
 
