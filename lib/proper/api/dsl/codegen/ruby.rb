@@ -83,6 +83,8 @@ module Proper
             file << "\n"
             file << "#{indent}include Proper::Api::Entity\n"
             file << "\n"
+            file << "#{indent}description { #{ model.description.inspect } }\n"
+            file << "\n"
             yield
             @indent -= 1
 
@@ -132,7 +134,7 @@ module Proper
               field_definition += options.to_a.map { |k, v| "#{k}: #{v.inspect}" }.join(", ")
 
               file << "#{ indent }# #{doc}\n"
-              file << "#{ indent }#{ field_definition }\n"
+              file << "#{ indent }#{ field_definition }, doc: #{ doc.inspect }\n"
             end
 
             @indent -= 1
