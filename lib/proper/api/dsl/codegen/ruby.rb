@@ -128,6 +128,7 @@ module Proper
               options[:values]  = ruby_model_fqn( options[:values].constantize ) if options.has_key?(:values)
               
               doc = options.delete(:doc)
+              options.delete(:get)
 
               field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
               field_definition += " :#{name}, "
@@ -209,6 +210,7 @@ module Proper
                   options[:values]  = ruby_model_fqn( options[:values].constantize ) if options.has_key?(:values)
 
                   doc = options.delete(:doc)
+                  options.delete(:get)
 
                   field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
                   field_definition += " :#{name}, "
@@ -229,6 +231,7 @@ module Proper
                   options[:values]  = ruby_model_fqn( options[:values].constantize ) if options.has_key?(:values)
 
                   doc = options.delete(:doc)
+                  options.delete(:get)
 
                   field_definition = schema.class.name.demodulize.underscore.gsub(/_schema$/, "")
                   field_definition += " :#{name}, "
