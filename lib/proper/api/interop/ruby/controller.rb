@@ -20,9 +20,14 @@ module Proper
 
           %w(get post put delete).each do |method|
             define_method( method ) do |uri, entity|
-              response = ::RestClient.send( method, options[:url] + uri, entity.represent( options[:format] || :json ) )
-              response.body
+              perform_request( method, options[:url] + uri, entity.represent( options[:format] || :json ) )
             end
+          end
+
+          #  Performs the request against a remote server.
+          #
+          def perform_request(method, url, data)
+            ::RestClient.send( method, url, data ).body
           end
 
         end
