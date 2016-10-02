@@ -37,7 +37,8 @@ module Proper
 
             response.body
           rescue RestClient::ExceptionWithResponse => e
-            @cookies = e.response.try(:cookies)            
+            @cookies = e.response.try(:cookies)     
+            raise e       
           end
 
         end
