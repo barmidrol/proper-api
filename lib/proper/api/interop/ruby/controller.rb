@@ -27,9 +27,14 @@ module Proper
           #  Performs the request against a remote server.
           #
           def perform_request(method, url, data)
-            response = ::RestClient.send( method, url, data, cookies: @cookies )
-            @cookies = response.try(:cookies)
+            response = if method.to_sym == :get
+              ::RestClient.send( method, url, cookies: @cookies )
+            else
+              ::RestClient.send( method, url, data, cookies: @cookies )
+            end
             
+            @cookies = response.try(:cookies)
+
             response.body
           end
 
