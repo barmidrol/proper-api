@@ -32,10 +32,12 @@ module Proper
             else
               ::RestClient.send( method, url, data, cookies: @cookies )
             end
-            
+
             @cookies = response.try(:cookies)
 
             response.body
+          rescue RestClient::ExceptionWithResponse => e
+            @cookies = e.response.try(:cookies)            
           end
 
         end
