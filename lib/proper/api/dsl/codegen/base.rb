@@ -90,10 +90,10 @@ module Proper
           #
           def extract_referenced_models( model, seen = {} )
             if seen[model]
-              return []
+              return [model]
             else
               seen[model] = true
-              referenced_models( model ) + referenced_models( model ).map { |ref| extract_referenced_models( ref, seen ) }
+              [model] + referenced_models( model ) + referenced_models( model ).map { |ref| extract_referenced_models( ref, seen ) }
             end
           end
 
