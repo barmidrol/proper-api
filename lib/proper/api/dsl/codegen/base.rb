@@ -70,7 +70,7 @@ module Proper
               ]
             end.flatten
 
-            roots.map { |root| extract_referenced_models(root) }.flatten.uniq
+            roots.map { |root| extract_referenced_models(root, {}) }.flatten.uniq
           end
 
           #  Dumps model file.
@@ -88,14 +88,21 @@ module Proper
           #  Attempts to extract nested model definitions – the one referenced by
           #  has_one or has_many schema arguments.
           #
-          def extract_referenced_models( model )
-            referenced_models( model ) + referenced_models( model ).map { |ref| extract_referenced_models(ref) } + [ model ]
+          def extract_referenced_models( model, seen = {} )
+            if seen[model]
+              return []
+            else
+              seen[model] = true
+              referenced_models( model ) + referenced_models( model ).map { |ref| extract_referenced_models( ref, seen ) }
+            end
           end
 
           #  Returns an array of models referenced by the passed one.
           #
           def referenced_models( model )
-            model.schema_definition.properties.values.select { |s| s.is_a?(Respect::HasOneSchema) || s.is_a?(Respect::HasManySchema) }.map(&:of)
+            model.schema_definition.properties.values.select do |s| 
+              s.is_a?(Respect::HasOneSchema) || s.is_a?(Respect::HasManySchema)
+            end.map(&:of)
           end
 
           #  mkdir -p for the specified path + open for write combined in one routine.
