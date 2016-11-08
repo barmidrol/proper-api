@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "respect"
   spec.add_dependency "colorize"
+  spec.add_dependency "multi_json"
   spec.add_dependency "rest-client"
 
   spec.add_development_dependency "bundler", "~> 1.11"
