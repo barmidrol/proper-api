@@ -26,11 +26,18 @@ module Proper
 
           #  Performs the request against a remote server.
           #
-          def perform_request(method, url, data)
+          def perform_request(method, url, data, json = true)
+            options = { cookies: @cookies }
+            
+            if json
+              options[:content_type] = "application/json"
+              data = MultiJson.dump( data )
+            end
+
             response = if method.to_sym == :get
-              ::RestClient.send( method, url, cookies: @cookies )
+              ::RestClient.send( method, url, options )
             else
-              ::RestClient.send( method, url, MultiJson.dump( data ), cookies: @cookies, content_type: "application/json" )
+              ::RestClient.send( method, url, dump_json ? MultiJson.dump( data ) : data, options )
             end
 
             @cookies = response.try(:cookies)
