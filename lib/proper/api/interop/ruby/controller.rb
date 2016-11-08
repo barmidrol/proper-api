@@ -28,9 +28,9 @@ module Proper
           #
           def perform_request(method, url, data)
             response = if method.to_sym == :get
-              ::RestClient.send( method, url, cookies: @cookies )
+              ::RestClient.send( method, url, cookies: @cookies, content_type: "application/json" )
             else
-              ::RestClient.send( method, url, data, cookies: @cookies )
+              ::RestClient.send( method, url, data, cookies: @cookies, content_type: "application/json" )
             end
 
             @cookies = response.try(:cookies)
