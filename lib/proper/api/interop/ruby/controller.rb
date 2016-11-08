@@ -37,7 +37,7 @@ module Proper
             response = if method.to_sym == :get
               ::RestClient.send( method, url, options )
             else
-              ::RestClient.send( method, url, dump_json ? MultiJson.dump( data ) : data, options )
+              ::RestClient.send( method, url, data, options )
             end
 
             @cookies = response.try(:cookies)
