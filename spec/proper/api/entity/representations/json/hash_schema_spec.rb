@@ -15,6 +15,19 @@ describe Respect::HashSchema::JSON do
       expect( schema.represent(:json, value) ).to eq( {x: 1.0, y: 2.0} )
     end
 
+    it "utilizes :get option on the field with serialization options" do
+      flag = nil
+
+      schema = Respect::HashSchema.define do |s|
+        s.float :x, get: -> (model, opts = {}) { flag = opts; model[:x] }
+      end
+
+      value = {x: 1.0}
+      schema.represent(:json, value, {name: :value})
+
+      expect( flag ).to eq({name: :value})
+    end
+
     it "crashes on nil when options don't allow it" do
       schema = Respect::HashSchema.new
 

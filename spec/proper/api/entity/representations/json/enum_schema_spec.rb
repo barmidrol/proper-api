@@ -10,14 +10,14 @@ describe Respect::EnumSchema::JSON do
   context "representation" do
 
     it "represents the float value of the target object" do
-      schema = Respect::EnumSchema.new(from: "EnumSchemaValuesTest")
+      schema = Respect::EnumSchema.new(values: "EnumSchemaValuesTest")
       value = "asd"
 
       expect( schema.represent(:json, value) ).to eq( "asd" )
     end
 
     it "crashes on values not allowed by schema" do
-      schema = Respect::EnumSchema.new(from: "EnumSchemaValuesTest")
+      schema = Respect::EnumSchema.new(values: "EnumSchemaValuesTest")
 
       expect(-> do
         schema.represent( :json, "def" )
@@ -25,7 +25,7 @@ describe Respect::EnumSchema::JSON do
     end
 
     it "crashes on nil when options don't allow it" do
-      schema = Respect::EnumSchema.new(from: "EnumSchemaValuesTest")
+      schema = Respect::EnumSchema.new(values: "EnumSchemaValuesTest")
 
       expect(-> do
         schema.represent( :json, nil )
@@ -33,7 +33,7 @@ describe Respect::EnumSchema::JSON do
     end
 
     it "works with nil when options allow it" do
-      schema = Respect::EnumSchema.new(allow_nil: true, from: "EnumSchemaValuesTest")
+      schema = Respect::EnumSchema.new(allow_nil: true, values: "EnumSchemaValuesTest")
 
       expect( schema.represent(:json, nil) ).to eq( nil )
     end
@@ -43,14 +43,14 @@ describe Respect::EnumSchema::JSON do
   context "parsing" do
 
     it "parses the float value of the target object" do
-      schema = Respect::EnumSchema.new(from: "EnumSchemaValuesTest")
+      schema = Respect::EnumSchema.new(values: "EnumSchemaValuesTest")
       value = "asd"
 
       expect( schema.parse(:json, value) ).to eq( "asd" )
     end
 
     it "crashes on nil when options don't allow it" do
-      schema = Respect::EnumSchema.new(from: "EnumSchemaValuesTest")
+      schema = Respect::EnumSchema.new(values: "EnumSchemaValuesTest")
 
       expect(-> do
         schema.parse( :json, nil )
@@ -58,7 +58,7 @@ describe Respect::EnumSchema::JSON do
     end
 
     it "crashes on values not allowed by schema" do
-      schema = Respect::EnumSchema.new(from: "EnumSchemaValuesTest")
+      schema = Respect::EnumSchema.new(values: "EnumSchemaValuesTest")
 
       expect(-> do
         schema.parse( :json, "def" )
@@ -66,7 +66,7 @@ describe Respect::EnumSchema::JSON do
     end
 
     it "works with nil when options allow it" do
-      schema = Respect::EnumSchema.new(allow_nil: true, from: "EnumSchemaValuesTest")
+      schema = Respect::EnumSchema.new(allow_nil: true, values: "EnumSchemaValuesTest")
 
       expect( schema.parse(:json, nil) ).to eq( nil )
     end

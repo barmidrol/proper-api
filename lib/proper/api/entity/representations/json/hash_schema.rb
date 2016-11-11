@@ -13,14 +13,14 @@ class Respect::HashSchema::JSON
 
     schema.properties.inject({}) do |memo, (name, property_schema)|
       value = if getter = property_schema.options[:get]
-        getter.call( object )
+        getter.call( object, options )
       elsif fname = property_schema.options[:from]
         value_is_hash ? object[ fname ] : object.send( fname )
       else
         value_is_hash ? object[ name ] : object.send( name )
       end
 
-      memo[ name ] = property_schema.represent( :json, value, name: name )
+      memo[ name ] = property_schema.represent( :json, value, options.merge(name: name) )
       memo
     end
   end
