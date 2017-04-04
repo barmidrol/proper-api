@@ -182,6 +182,11 @@ module Proper
             custom = nil
             collection = false
 
+            schema_item = schema.instance_variable_get(:@item)
+            if type == "List<string>" && schema_item && schema_item.is_a?(::Respect::AnySchema)
+              type = "List<object>"
+            end
+
             if schema.is_a?(Respect::HasOneSchema)
               type = sanitize_model_namespace( schema.of ) + "." + sanitize_model_class( schema.of )
               custom = type
