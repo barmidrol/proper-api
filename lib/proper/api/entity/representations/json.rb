@@ -11,6 +11,7 @@ require_relative "json/integer_schema"
 require_relative "json/string_schema"
 require_relative "json/enum_schema"
 require_relative "json/array_schema"
+require_relative "json/any_schema"
 
 module Proper
   module Api
