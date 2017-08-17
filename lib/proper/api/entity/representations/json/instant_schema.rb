@@ -13,4 +13,36 @@ class Respect::InstantSchema::JSON
     Time.parse( value )
   end
 
+  #  Compiles representer code that writes the value into +result+ variable.
+  #
+  def compile_representer!( via, schema, from, to )
+    var = ::Proper::Api::Entity.random_variable!
+    code = "#{var} = #{from}\n"
+
+    code << "if #{var}.nil?\n"
+    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "#{to} = nil\n" if schema.allow_nil?
+    code << "else\n"
+    code << "#{ to } = #{ var }.utc.strftime('%Y-%m-%dT%H:%M:%SZ')\n"
+    code << "end\n"
+
+    code
+  end
+
+  #  Compiles representer code that writes the value into +result+ variable.
+  #
+  def compile_parser!( via, schema, from, to )
+    var = ::Proper::Api::Entity.random_variable!
+    code = "#{var} = #{from}\n"
+
+    code << "if #{var}.nil?\n"
+    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "#{to} = nil\n" if schema.allow_nil?
+    code << "else\n"
+    code << "#{ to } = DateTime.parse( #{ var }.to_s )\n"
+    code << "end\n"
+
+    code
+  end
+
 end

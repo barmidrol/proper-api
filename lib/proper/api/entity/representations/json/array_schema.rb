@@ -35,4 +35,48 @@ class Respect::ArraySchema::JSON
     value
   end
 
+  #  Compiles representer code that writes the value into +result+ variable.
+  #
+  def compile_representer!( via, schema, from, to )
+    var = ::Proper::Api::Entity.random_variable!
+    code = "#{var} = #{from}\n"
+    
+    code << "if #{var}.nil?\n"
+    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "#{to} = nil\n" if schema.allow_nil?
+    code << "else\n"
+
+    var2 = ::Proper::Api::Entity.random_variable!
+
+    code << "#{to} = #{var}.map do |#{var2}|\n"
+    code << "#{var2}.respond_to?(:represent) ? #{var2}.represent( :json, options ) : #{var2}\n"
+    code << "end\n"
+
+    code << "end\n"
+
+    code
+  end
+
+  #  Compiles representer code that writes the value into +result+ variable.
+  #
+  def compile_parser!( via, schema, from, to )
+    var = ::Proper::Api::Entity.random_variable!
+    code = "#{var} = #{from}\n"
+    
+    code << "if #{var}.nil?\n"
+    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "#{to} = nil\n" if schema.allow_nil?
+    code << "else\n"
+
+    var2 = ::Proper::Api::Entity.random_variable!
+
+    code << "#{to} = #{var}.map do |#{var2}|\n"
+    code << "#{var2}\n"
+    code << "end\n"
+
+    code << "end\n"
+
+    code
+  end
+
 end

@@ -22,6 +22,33 @@ module Proper
 
       extend ActiveSupport::Concern
 
+      class << self
+
+        attr_accessor :do_the_magic
+
+        #  Stores proc into a global code cache.
+        #
+        def store_proc!( proc )
+          @@__procs__ ||= {}
+
+          id = proc.object_id
+          @@__procs__[ id ] = proc
+
+          "::Proper::Api::Entity.fetch_proc!( #{ id.inspect } )"
+        end
+
+        #  Returns proc object by id.
+        #
+        def fetch_proc!( id )
+          @@__procs__[ id ]
+        end
+
+        def random_variable!
+          "tmp#{ SecureRandom.hex }"
+        end
+
+      end
+
       #  Represents the given data using the strategy supplied as +via+ param.
       #
       def represent(via, options = {})
@@ -36,6 +63,11 @@ module Proper
         #  Represents the given data using the strategy supplied as +via+ param.
         #
         def represent(via, object_or_hash, options = {})
+          if ::Proper::Api::Entity.do_the_magic
+            self.send :define_singleton_method, :represent, &eval(compile_representer!(via))
+            represent( via, object_or_hash, options )
+          end
+
           @schema_definition.represent( via, object_or_hash, options )
         end
 
@@ -43,6 +75,12 @@ module Proper
         #
         def parse(via, data, options = {}, object = nil)
           data = data.to_unsafe_hash if data.respond_to?(:to_unsafe_hash) 
+
+          if ::Proper::Api::Entity.do_the_magic
+            self.send :define_singleton_method, :parse, &eval(compile_parser!(via))
+            parse( via, data, options, object )
+          end
+
           hash = @schema_definition.parse( via, data, options )
 
           return hash if object == {}
@@ -72,6 +110,48 @@ module Proper
           else
             @description
           end
+        end
+
+      protected
+
+        #  Returns a proc object that accepts two arguments (obj and options) and
+        #  works as a static representer for this entity.
+        #
+        def compile_representer!( via, top_level = true, from = "data", to = "result" )
+          code = if top_level
+            "-> (via, data, options = {}) do\n" + "  result = {}\n"
+          else
+            ""
+          end
+
+          code << @schema_definition.compile_representer!( via, from, to )
+
+          if top_level
+            code << "  result\n"
+            code << "end\n"
+          end
+
+          code
+        end
+
+        #  Returns a proc object that accepts two arguments (obj and options) and
+        #  works as a static representer for this entity.
+        #
+        def compile_parser!( via, top_level = true, from = "data", to = "result" )
+          code = if top_level
+            "-> (via, data, options = {}, object = nil) do\n" + "  result = object || #{self.name}.new\n"
+          else
+            ""
+          end
+
+          code << @schema_definition.compile_parser!( via, from, to )
+
+          if top_level
+            code << "  result\n"
+            code << "end\n"
+          end
+
+          code
         end
 
       end
