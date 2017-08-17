@@ -97,7 +97,7 @@ class Respect::HashSchema::JSON
     code << "if #{to}.is_a?(Hash)\n"
     code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, true )
     code << "else\n"
-    code << compile_properties_representation!( via, schema, from, to, true, false )
+    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, false )
     code << "end\n"
 
     code
