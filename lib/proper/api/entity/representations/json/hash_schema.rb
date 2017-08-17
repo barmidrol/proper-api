@@ -63,7 +63,7 @@ class Respect::HashSchema::JSON
 
   #  Compiles properties' representation code using hash access variant if corresponding flag is set.
   #
-  def compile_properties_representation!( via, schema, from, to, hash, out_hash )
+  def compile_properties_representation!( via, schema, from, to, hash, out_hash, is_parser = false )
     var = ::Proper::Api::Entity.random_variable!
     code = "#{var} = #{from}\n"
 
@@ -81,7 +81,12 @@ class Respect::HashSchema::JSON
       end
 
       code << "_field_name = #{ name.inspect }\n"
-      code << property_schema.compile_representer!( via, property_value_chunk, "#{to}" + (out_hash ? "[#{name.inspect}]" : ".#{name}") )
+      
+      if is_parser
+        code << property_schema.compile_parser!( via, property_value_chunk, "#{to}" + (out_hash ? "[#{name.inspect}]" : ".#{name}") )
+      else
+        code << property_schema.compile_representer!( via, property_value_chunk, "#{to}" + (out_hash ? "[#{name.inspect}]" : ".#{name}") )
+      end
     end
 
     code << "end\n"
@@ -95,9 +100,9 @@ class Respect::HashSchema::JSON
     code = "#{to} = #{to} || {}\n"
 
     code << "if #{to}.is_a?(Hash)\n"
-    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, true )
+    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, true, true )
     code << "else\n"
-    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, false )
+    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, false, true )
     code << "end\n"
 
     code
