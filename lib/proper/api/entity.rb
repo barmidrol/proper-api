@@ -147,7 +147,7 @@ module Proper
             "  _field_name = '<root json>'\n" +
             "  _object = data\n"
           else
-            ""
+            "  #{to} = #{to} || ::#{self.name}.new\n"
           end
 
           code << @schema_definition.compile_parser!( via, from, to )
