@@ -98,11 +98,12 @@ class Respect::HashSchema::JSON
   #
   def compile_parser!( via, schema, from, to )
     code = "#{to} = #{to} || {}\n"
+    code << "#{from} = #{from}.with_indifferent_access if #{from}.is_a?(::Hash)"
 
     code << "if #{to}.is_a?(Hash)\n"
-    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, true, true )
+    code << compile_properties_representation!( via, schema, from, to, true, true, true )
     code << "else\n"
-    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, false, true )
+    code << compile_properties_representation!( via, schema, from, to, true, false, true )
     code << "end\n"
 
     code
