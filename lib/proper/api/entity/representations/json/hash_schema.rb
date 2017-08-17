@@ -53,7 +53,7 @@ class Respect::HashSchema::JSON
     code = ""
 
     code << "if #{from}.is_a?(Hash)\n"
-    code << compile_properties_representation!( via, schema, from, to, true, true )
+    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, true )
     code << "else\n"
     code << compile_properties_representation!( via, schema, from, to, false, true )
     code << "end\n"
@@ -65,7 +65,7 @@ class Respect::HashSchema::JSON
   #
   def compile_properties_representation!( via, schema, from, to, hash, out_hash )
     var = ::Proper::Api::Entity.random_variable!
-    code = "#{var} = #{from}.try(:with_indifferent_access)\n"
+    code = "#{var} = #{from}\n"
 
     code << "if #{var}.nil?\n"
     code << "raise Respect::ValidationError.new(\"Found nil under \#{_field_name} for object \#{_object}\")\n" unless schema.allow_nil? 
@@ -95,7 +95,7 @@ class Respect::HashSchema::JSON
     code = ""
 
     code << "if #{to}.is_a?(Hash)\n"
-    code << compile_properties_representation!( via, schema, from, to, true, true )
+    code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, true )
     code << "else\n"
     code << compile_properties_representation!( via, schema, from, to, true, false )
     code << "end\n"
