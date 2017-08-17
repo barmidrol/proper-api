@@ -23,7 +23,7 @@ class Respect::HasOneSchema::JSON
     code = "#{var} = #{from}\n"
 
     code << "if #{var}.nil?\n"
-    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "raise Respect::ValidationError.new(\"Found nil under \#{_field_name} for object \#{_object}\")\n" unless schema.allow_nil? 
     code << "#{ to } = nil\n" if schema.allow_nil?
     code << "else\n"
     code << schema.of.send( :compile_representer!, via, false, from, to )
@@ -39,7 +39,7 @@ class Respect::HasOneSchema::JSON
     code = "#{var} = #{from}\n"
 
     code << "if #{var}.nil?\n"
-    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "raise Respect::ValidationError.new(\"Found nil under \#{_field_name} for object \#{_object}\")\n" unless schema.allow_nil? 
     code << "#{ to } = nil\n" if schema.allow_nil?
     code << "else\n"
     code << schema.of.send( :compile_parser!, via, false, from, to )

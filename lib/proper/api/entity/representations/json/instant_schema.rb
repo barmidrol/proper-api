@@ -20,7 +20,7 @@ class Respect::InstantSchema::JSON
     code = "#{var} = #{from}\n"
 
     code << "if #{var}.nil?\n"
-    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "raise Respect::ValidationError.new(\"Found nil under \#{_field_name} for object \#{_object}\")\n" unless schema.allow_nil? 
     code << "#{to} = nil\n" if schema.allow_nil?
     code << "else\n"
     code << "#{ to } = #{ var }.utc.strftime('%Y-%m-%dT%H:%M:%SZ')\n"
@@ -36,7 +36,7 @@ class Respect::InstantSchema::JSON
     code = "#{var} = #{from}\n"
 
     code << "if #{var}.nil?\n"
-    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "raise Respect::ValidationError.new(\"Found nil under \#{_field_name} for object \#{_object}\")\n" unless schema.allow_nil? 
     code << "#{to} = nil\n" if schema.allow_nil?
     code << "else\n"
     code << "#{ to } = DateTime.parse( #{ var }.to_s )\n"

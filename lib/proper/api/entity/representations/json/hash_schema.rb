@@ -68,9 +68,10 @@ class Respect::HashSchema::JSON
     code = "#{var} = #{from}\n"
 
     code << "if #{var}.nil?\n"
-    code << "raise Respect::ValidationError.new\n" unless schema.allow_nil? 
+    code << "raise Respect::ValidationError.new(\"Found nil under \#{_field_name} for object \#{_object}\")\n" unless schema.allow_nil? 
     code << "#{to} = nil\n" if schema.allow_nil?
     code << "else\n"
+    code << "_object = #{var}\n"
 
     schema.properties.inject({}) do |memo, (name, property_schema)|
       property_value_chunk = if getter = property_schema.options[:get]
@@ -79,6 +80,7 @@ class Respect::HashSchema::JSON
         hash ? "#{var}[#{fname.inspect}]" : "#{var}.#{fname}"
       end
 
+      code << "_field_name = #{ name.inspect }\n"
       code << property_schema.compile_representer!( via, property_value_chunk, "#{to}" + (out_hash ? "[#{name.inspect}]" : ".#{name}") )
     end
 

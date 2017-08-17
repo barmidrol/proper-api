@@ -119,7 +119,10 @@ module Proper
         #
         def compile_representer!( via, top_level = true, from = "data", to = "result" )
           code = if top_level
-            "-> (via, data, options = {}) do\n" + "  result = {}\n"
+            "-> (via, data, options = {}) do\n" + 
+            "  result = {}\n" + 
+            "  _field_name = '<root json>'\n" +
+            "  _object = data\n"
           else
             ""
           end
@@ -139,7 +142,10 @@ module Proper
         #
         def compile_parser!( via, top_level = true, from = "data", to = "result" )
           code = if top_level
-            "-> (via, data, options = {}, object = nil) do\n" + "  result = object || #{self.name}.new\n"
+            "-> (via, data, options = {}, object = nil) do\n" + 
+            "  result = object || #{self.name}.new\n" + 
+            "  _field_name = '<root json>'\n" +
+            "  _object = data\n"
           else
             ""
           end
