@@ -92,7 +92,7 @@ class Respect::HashSchema::JSON
   #  Compiles representer code that writes the value into +result+ variable.
   #
   def compile_parser!( via, schema, from, to )
-    code = "#{from} = #{from} || {}\n"
+    code = "#{to} = #{to} || {}\n"
 
     code << "if #{from}.is_a?(Hash)\n"
     code << compile_properties_representation!( via, schema, from + ".with_indifferent_access", to, true, false )
