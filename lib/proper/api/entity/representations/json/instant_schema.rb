@@ -37,9 +37,9 @@ class Respect::InstantSchema::JSON
 
     code << "if #{var}.nil?\n"
     code << "raise Respect::ValidationError.new(\"Found nil under \#{_field_name} for object \#{_object}\")\n" unless schema.allow_nil? 
-    code << "#{to} = nil\n" if schema.allow_nil?
+    code << "#{ to } = nil\n" if schema.allow_nil?
     code << "else\n"
-    code << "#{ to } = DateTime.parse( #{ var }.to_s )\n"
+    code << "#{ to } = Time.parse( #{ var }.to_s )\n"
     code << "end\n"
 
     code

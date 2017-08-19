@@ -59,7 +59,6 @@ class Respect::HasManySchema::JSON
     var3 = ::Proper::Api::Entity.random_variable!
     var4 = ::Proper::Api::Entity.random_variable!
     code << "#{to} = #{var}.map.with_index do |#{var2}, #{var4}|\n"
-    code << "#{var3} = {}\n"
     code << "_field_name = #{field_name_var}.to_s + \"[\#{#{var4}}]\"\n"
     code << schema.of.send( :compile_parser!, via, false, "#{var2}", "#{var3}" )
     code << "#{var3}\n"
