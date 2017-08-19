@@ -74,10 +74,14 @@ class Respect::HashSchema::JSON
     code << "_object = #{var}\n"
 
     schema.properties.inject({}) do |memo, (name, property_schema)|
-      property_value_chunk = if getter = property_schema.options[:get]
-        ::Proper::Api::Entity.store_proc!( getter ) + "[ #{var}, options ]"
-      else fname = (property_schema.options[:from] || name)
-        hash ? "#{var}[#{fname.inspect}]" : "#{var}.#{fname}"
+      property_value_chunk = unless is_parser
+        if getter = property_schema.options[:get]
+          ::Proper::Api::Entity.store_proc!( getter ) + "[ #{var}, options ]"
+        else fname = (property_schema.options[:from] || name)
+          hash ? "#{var}[#{fname.inspect}]" : "#{var}.#{fname}"
+        end
+      else
+        hash ? "#{var}[#{name.inspect}]" : "#{var}.#{name}"
       end
 
       code << "_field_name = #{ name.inspect }\n"

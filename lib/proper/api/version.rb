@@ -1,5 +1,5 @@
 module Proper
   module Api
-    VERSION = "0.19.14"
+    VERSION = "0.19.15"
   end
 end
