@@ -73,6 +73,10 @@ class Respect::HashSchema::JSON
     code << "else\n"
     code << "_object = #{var}\n"
 
+    if out_hash
+      code << "#{to} ||= {}\n"
+    end
+
     schema.properties.inject({}) do |memo, (name, property_schema)|
       property_value_chunk = unless is_parser
         if getter = property_schema.options[:get]
