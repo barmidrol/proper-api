@@ -12,10 +12,14 @@ module Proper
           #  Holds options passed during the initialization.
           attr_reader :options
 
+          #  Holds request options to be merged into every request.
+          attr_accessor :request_options
+
           #  Creates a new instance of API controller.
           #
           def initialize(options = {})
             @options = options
+            @request_options = {}
           end
 
           %w(get post put delete).each do |method|
@@ -27,7 +31,7 @@ module Proper
           #  Performs the request against a remote server.
           #
           def perform_request(method, url, data, json = true)
-            options = { cookies: @cookies }
+            options = { cookies: @cookies }.merge( @request_options )
             
             if json
               options[:content_type] = "application/json"
