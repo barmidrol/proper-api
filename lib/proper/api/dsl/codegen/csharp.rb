@@ -170,12 +170,9 @@ module Proper
           #  Returns C# type which corresponds to a specific schema definition.
           #
           def csharp_type_for_schema_definition( schema )
-            type = {
+            types = {
               ::Respect::ArraySchema => "List<string>",
               ::Respect::BooleanSchema => "bool#{ schema.allow_nil? ? "?" : "" }",
-              ::Respect::DatetimeSchema => "NodaTime.Instant#{ schema.allow_nil? ? "?" : "" }",
-              ::Respect::InstantSchema => "NodaTime.Instant#{ schema.allow_nil? ? "?" : "" }",
-              ::Respect::DateSchema => "NodaTime.LocalDate#{ schema.allow_nil? ? "?" : "" }",
               ::Respect::FloatSchema => "float#{ schema.allow_nil? ? "?" : "" }",
               ::Respect::HashSchema => "Dictionary<string, object>",
               ::Respect::IntegerSchema => "long#{ schema.allow_nil? ? "?" : "" }",
@@ -183,7 +180,23 @@ module Proper
               ::Respect::AnySchema => "object",
               ::Respect::GeoPointSchema => "global::#{ base_api_namespace() }.Fields.GeoPoint",
               ::Respect::AttachmentSchema => "global::#{ base_api_namespace() }.Fields.Attachment"
-            }[ schema.class ]
+            }
+
+            if options[:use_noda_time] == "true" || options[:use_noda_time] == "1"
+              types.merge({
+                ::Respect::DatetimeSchema => "NodaTime.Instant#{ schema.allow_nil? ? "?" : "" }",
+                ::Respect::InstantSchema => "NodaTime.Instant#{ schema.allow_nil? ? "?" : "" }",
+                ::Respect::DateSchema => "NodaTime.LocalDate#{ schema.allow_nil? ? "?" : "" }"
+              })
+            else
+              types.merge({
+                ::Respect::DatetimeSchema => "DateTime#{ schema.allow_nil? ? "?" : "" }",
+                ::Respect::InstantSchema => "DateTime#{ schema.allow_nil? ? "?" : "" }",
+                ::Respect::DateSchema => "DateTime#{ schema.allow_nil? ? "?" : "" }"
+              })
+            end
+
+            type = types[ schema.class ]
 
             custom = nil
             collection = false
