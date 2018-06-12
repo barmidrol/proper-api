@@ -8,8 +8,9 @@ namespace :proper do
       options = {
         folder:           arguments[:folder],
 
-        model_namespace:  ENV["MODEL_NAMESPACE"] || "WorldServer::Models",
-        api_namespace:    ENV["API_NAMESPACE"] || "WorldServer::Controllers",
+        model_namespace:    ENV["MODEL_NAMESPACE"] || "WorldServer::Models",
+        api_namespace:      ENV["API_NAMESPACE"] || "WorldServer::Controllers",
+        base_api_namespace: ENV["BASE_API_NAMESPACE"] || "App.Platform.Api",
       }
 
       endpoints = Proper::Api::Dsl.collect_api_definitions!( "/api" )

@@ -23,6 +23,12 @@ module Proper
             options[:api_namespace]
           end
 
+          #  Contains base namespace for base api classes
+          #
+          def base_api_namespace
+            options[:base_api_namespace]
+          end
+
           #  Converts model's namespace to C# one.
           #
           def sanitize_model_namespace( model )
@@ -143,9 +149,9 @@ module Proper
           #
           def emit_model_class!( file, model, &block )
             inheritance = if request_models.include?(model)
-              " : App.Platform.Api.RequestMessage"
+              " : #{ base_api_namespace() }.RequestMessage"
             elsif response_models.include?(model)
-              " : App.Platform.Api.ResponseMessage"
+              " : #{ base_api_namespace() }.ResponseMessage"
             else
               ""
             end
@@ -175,8 +181,8 @@ module Proper
               ::Respect::IntegerSchema => "long#{ schema.allow_nil? ? "?" : "" }",
               ::Respect::StringSchema => "string",
               ::Respect::AnySchema => "object",
-              ::Respect::GeoPointSchema => "global::App.Platform.Api.Fields.GeoPoint",
-              ::Respect::AttachmentSchema => "global::App.Platform.Api.Fields.Attachment"
+              ::Respect::GeoPointSchema => "global::#{ base_api_namespace() }.Fields.GeoPoint",
+              ::Respect::AttachmentSchema => "global::#{ base_api_namespace() }.Fields.Attachment"
             }[ schema.class ]
 
             custom = nil
@@ -334,7 +340,7 @@ module Proper
           def emit_api_class!( file, controller )
             emit_summary_comment!(file, controller.const_get(:DESCRIPTION))
 
-            file << "#{indent}public partial class #{ sanitize_api_class(controller) } : App.Platform.Api.Controller {\n\n"
+            file << "#{indent}public partial class #{ sanitize_api_class(controller) } : #{ base_api_namespace() }.Controller {\n\n"
             
             @indent += 1
             yield
