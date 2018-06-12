@@ -308,6 +308,7 @@ module Proper
           def emit_model_usings!( file, model )
             namespaces = []
 
+            namespaces << "System"
             namespaces << "System.Collections.Generic"
             namespaces << "System.Runtime.Serialization"
 
@@ -323,10 +324,10 @@ module Proper
           def emit_api_usings!( file, controller )
             namespaces = []
 
+            namespaces << "System"
             namespaces << "System.Collections.Generic"
             namespaces << "System.Threading.Tasks"
             namespaces << "Newtonsoft.Json"
-            namespaces << "System"
 
             namespaces.each do |ns|
               file << "#{indent}using #{ ns };\n"
