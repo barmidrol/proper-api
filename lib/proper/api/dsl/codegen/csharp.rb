@@ -167,9 +167,9 @@ module Proper
             type = {
               ::Respect::ArraySchema => "List<string>",
               ::Respect::BooleanSchema => "bool#{ schema.allow_nil? ? "?" : "" }",
-              ::Respect::DatetimeSchema => "Instant#{ schema.allow_nil? ? "?" : "" }",
-              ::Respect::InstantSchema => "Instant#{ schema.allow_nil? ? "?" : "" }",
-              ::Respect::DateSchema => "LocalDate#{ schema.allow_nil? ? "?" : "" }",
+              ::Respect::DatetimeSchema => "NodaTime.Instant#{ schema.allow_nil? ? "?" : "" }",
+              ::Respect::InstantSchema => "NodaTime.Instant#{ schema.allow_nil? ? "?" : "" }",
+              ::Respect::DateSchema => "NodaTime.LocalDate#{ schema.allow_nil? ? "?" : "" }",
               ::Respect::FloatSchema => "float#{ schema.allow_nil? ? "?" : "" }",
               ::Respect::HashSchema => "Dictionary<string, object>",
               ::Respect::IntegerSchema => "long#{ schema.allow_nil? ? "?" : "" }",
@@ -291,7 +291,6 @@ module Proper
 
             namespaces << "System.Collections.Generic"
             namespaces << "System.Runtime.Serialization"
-            namespaces << "NodaTime"
 
             namespaces.each do |ns|
               file << "#{indent}using #{ ns };\n"
