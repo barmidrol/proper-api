@@ -182,7 +182,7 @@ module Proper
               ::Respect::AttachmentSchema => "global::#{ base_api_namespace() }.Fields.Attachment"
             }
 
-            if options[:use_noda_time] == "true" || options[:use_noda_time] == "1"
+            types = if options[:use_noda_time] == "true" || options[:use_noda_time] == "1"
               types.merge({
                 ::Respect::DatetimeSchema => "NodaTime.Instant#{ schema.allow_nil? ? "?" : "" }",
                 ::Respect::InstantSchema => "NodaTime.Instant#{ schema.allow_nil? ? "?" : "" }",
