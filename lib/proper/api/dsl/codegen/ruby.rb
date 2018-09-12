@@ -247,7 +247,7 @@ module Proper
               file << "#{indent}  request = #{request_class}.parse( :json, request ) if request.is_a?(Hash)\n"
               file << "#{indent}  request = #{request_class}.new if request.nil?\n"
               file << "#{indent}  data = #{endpoint.method()}( #{ endpoint.path.inspect.gsub(":id", '" + request.id.to_s + "').gsub("(.:format)", ".json") }, request )\n"
-              file << "#{indent}  #{response_class}.parse( :json, MultiJson.load(data) )\n"
+              file << "#{indent}  #{response_class}.parse( :json, MultiJson.load(data) ) unless data.empty?\n" 
               file << "#{indent}end\n\n"
             end
           end
