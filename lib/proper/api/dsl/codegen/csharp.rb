@@ -397,7 +397,8 @@ module Proper
               description = endpoint.options[:via].const_get(:DESCRIPTION)
               emit_summary_comment!(file, description)
 
-              file << "#{indent}public async #{task_class} #{ sanitize_method_name( endpoint.action ) }Async(#{ signature.join(", ") }) {\n"
+              static = if options[:generate_static_methods] == "1" then " static " else " " end
+              file << "#{indent}public#{static}async #{task_class} #{ sanitize_method_name( endpoint.action ) }Async(#{ signature.join(", ") }) {\n"
               @indent += 1
               
               file << "#{indent}request = request ?? new #{request_class}();\n" if request_class.present?

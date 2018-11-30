@@ -8,10 +8,11 @@ namespace :proper do
       options = {
         folder:           arguments[:folder],
 
-        model_namespace:    ENV["MODEL_NAMESPACE"] || "WorldServer::Models",
-        api_namespace:      ENV["API_NAMESPACE"] || "WorldServer::Controllers",
-        base_api_namespace: ENV["BASE_API_NAMESPACE"] || "App.Platform.Api",
-        use_noda_time:      ENV["USE_NODA_TIME"] || "false"
+        model_namespace:         ENV["MODEL_NAMESPACE"] || "WorldServer::Models",
+        api_namespace:           ENV["API_NAMESPACE"] || "WorldServer::Controllers",
+        base_api_namespace:      ENV["BASE_API_NAMESPACE"] || "App.Platform.Api",
+        use_noda_time:           ENV["USE_NODA_TIME"] || "false",
+        generate_static_methods: ENV["GENERATE_STATIC_METHODS"] || "false"
       }
 
       endpoints = Proper::Api::Dsl.collect_api_definitions!( "/api" )
