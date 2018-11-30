@@ -285,7 +285,7 @@ module Proper
               emit_summary_comment!(file, schema.options[:doc]) if schema.options[ :doc ]
 
               file << "#{indent}[DataMember(Name=#{ name.to_s.inspect })]\n"
-              file << "#{indent}public #{ type } #{ sanitize_property_name(name) } { get; set; }"
+              file << "#{indent}public #{ type } #{ sanitize_property_name(name) };"
               file << "\n\n"
             end
           end
